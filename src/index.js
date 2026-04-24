@@ -29,6 +29,7 @@ dotenv.config();
 import db from "../database/db.js";
 import { app } from "../app.js";
 import quizRoutes from "../routes/quiz.routes.js";
+import serverless from "serverless-http";
 
 // routes
 app.use("/api/quiz", quizRoutes);
@@ -44,8 +45,8 @@ const connectDB = async () => {
   }
 };
 
+// Initialize DB connection before handling requests
+await connectDB();
+
 // export handler for Vercel
-export default async function handler(req, res) {
-  await connectDB();
-  return app(req, res);
-}
+export default serverless(app);

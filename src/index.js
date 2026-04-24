@@ -31,22 +31,34 @@ import { app } from "../app.js";
 import quizRoutes from "../routes/quiz.routes.js";
 import serverless from "serverless-http";
 
-// routes
-app.use("/api/quiz", quizRoutes);
-
 // connect DB ONCE
 let isConnected = false;
 
 const connectDB = async () => {
   if (!isConnected) {
-    await db();
-    isConnected = true;
-    console.log("✅ MongoDB connected");
+    try {
+      await db();
+      isConnected = true;
+      console.log("✅ MongoDB connected");
+    } catch (err) {
+      console.error("❌ MongoDB connection failed:", err);
+      throw err;
+    }
   }
 };
 
-// Initialize DB connection before handling requests
-await connectDB();
+// Middleware to ensure DB connection
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ error: "Database connection failed" });
+  }
+});
+
+// routes
+app.use("/api/quiz", quizRoutes);
 
 // export handler for Vercel
 export default serverless(app);

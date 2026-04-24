@@ -5,9 +5,13 @@ import cookieParser from "cookie-parser";
 const app = express();
 
 app.use(cors({
-  origin: "https://digipatashala-frontend.vercel.app",
+  origin: [
+    "http://localhost:5173",
+    "https://digipatashala-frontend.vercel.app"
+  ],
   credentials: true,
 }));
+app.options("*", cors());
 
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
